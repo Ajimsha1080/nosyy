@@ -3,16 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🎵 Audio Separation API</title>
+  <title>🎵 Audio Separation</title>
 </head>
 <body>
   <h2>Upload Audio to Separate Vocals & Music</h2>
   <input type="file" id="audioFile" accept="audio/*" />
   <button onclick="uploadAudio()">Upload & Separate</button>
-
   <div id="result"></div>
 
   <script>
+    // Replace this with your actual Render backend URL
+    const BACKEND_URL = "https://nosy-nky9.onrender.com";
+
     async function uploadAudio() {
       const fileInput = document.getElementById("audioFile");
       if (!fileInput.files.length) return alert("Select an audio file first.");
@@ -23,9 +25,9 @@
       document.getElementById("result").innerText = "Processing... ⏳";
 
       try {
-        const response = await fetch("https://nosy-nky9.onrender.com/separate", {
+        const response = await fetch(`${BACKEND_URL}/separate`, {
           method: "POST",
-          body: formData,
+          body: formData
         });
 
         if (!response.ok) throw new Error("Separation failed");
