@@ -1,1 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎵 Audio Separation App</title>
+<style>
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f2f4f8;
+  text-align: center;
+  padding: 40px;
+}
+button {
+  background: #0078ff;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+button:hover { background: #005fcc; }
+.card {
+  background: white;
+  padding: 20px;
+  max-width: 500px;
+  margin: 30px auto;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+audio {
+  display: block;
+  width: 80%;
+  margin: 10px auto;
+}
+</style>
+</head>
+<body>
+
+<h1>🎧 Audio Separation App</h1>
+<p>Upload your audio file to extract vocals and background.</p>
+
+<div class="card">
+  <input type="file" id="fileInput" accept="audio/*"><br><br>
+  <button onclick="uploadFile()">Upload & Separate</button>
+</div>
+
+<div id="status"></div>
+<div id="result"></div>
+
+<script>
+const BACKEND_URL = "https://nosy-nky9.onrender.com"; // 🔗 Replace with your backend URL
+
+async function uploadFile() {
+  const fileInput = document.getElementById("fileInput");
+  if (!fileInput.files.length) { alert("Select an audio file first."); return; }
+
+  const file = fileInput.files[0];
+  const formData = new FormData();
+  formData.append("file", file);
+
+  document.getElementById("status").innerText = "⏳ Uploading & processing...";
+  document.getElementById("result").innerHTML = "";
+
+  try {
+    const res = await fetch(`${BACKEND_URL}/separate`, {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Separation failed");
+
+    document.getElementById("status").innerText = data.message;
+
+    document.getElementById("result").innerHTML = `
+      <h3>🎤 Vocals</h3>
+      <audio controls src="${BACKEND_URL}${data.vocals}"></audio>
+      <a href="${BACKEND_URL}${data.vocals}" download>⬇️ Download Vocals</a>
+
+      <h3>🎶 Background</h3>
+      <audio controls src="${BACKEND_URL}${data.accompaniment}"></audio>
+      <a href="${BACKEND_URL}${data.accompaniment}" download>⬇️ Download Background</a>
+    `;
+  } catch (err) {
+    document.getElementById("status").innerText = `❌ Error: ${err.message}`;
+  }
+}
+</script>
+</body>
+</html>
 
